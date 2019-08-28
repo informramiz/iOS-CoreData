@@ -21,8 +21,9 @@ class NotebooksListViewController: UIViewController, UITableViewDataSource {
         super.viewDidLoad()
         navigationItem.titleView = UIImageView(image: #imageLiteral(resourceName: "toolbar-cow"))
         navigationItem.rightBarButtonItem = editButtonItem
-        updateEditButtonState()
         loadData()
+        
+        updateEditButtonState()
     }
     
     private func loadData() {
@@ -90,8 +91,13 @@ class NotebooksListViewController: UIViewController, UITableViewDataSource {
     /// Adds a new notebook to the end of the `notebooks` array
     func addNotebook(name: String) {
         let notebook = Notebook(context: dataController.viewContext)
-        notebooks.append(notebook)
-        tableView.insertRows(at: [IndexPath(row: numberOfNotebooks - 1, section: 0)], with: .fade)
+        notebook.name = name
+        notebook.creationDate = Date()
+        
+        try? dataController.viewContext.save()
+        
+        notebooks.insert(notebook, at: 0)
+        tableView.insertRows(at: [IndexPath(row: 0, section: 0)], with: .fade)
         updateEditButtonState()
     }
 
