@@ -12,10 +12,17 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-
+    let dataController = DataController(modelName: "Mooskine")
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        dataController.load()
+        
+        //pass data controller to the top view controller: NotebooksListViewController
+        let navController = window?.rootViewController as! UINavigationController
+        let notebooksListViewController = navController.topViewController as! NotebooksListViewController
+        notebooksListViewController.dataController = dataController
+        
         return true
     }
 
