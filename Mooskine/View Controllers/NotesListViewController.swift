@@ -70,8 +70,6 @@ class NotesListViewController: UIViewController, UITableViewDataSource {
     // Adds a new `Note` to the end of the `notebook`'s `notes` array
     func addNote() {
         let note = Note(context: dataController.viewContext)
-        note.text = "New Note"
-        note.creationDate = Date()
         note.notebook = notebook
         try? dataController.viewContext.save()
         

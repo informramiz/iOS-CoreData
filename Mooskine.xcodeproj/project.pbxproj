@@ -23,6 +23,8 @@
 		A76557E91F8BC1FB00EFF9B8 /* OpenSans-Semibold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A76557E41F8BC1AC00EFF9B8 /* OpenSans-Semibold.ttf */; };
 		B427CC4623160A5300B0E992 /* Mooskine.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B427CC4423160A5300B0E992 /* Mooskine.xcdatamodeld */; };
 		B427CC482316150300B0E992 /* DataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B427CC472316150300B0E992 /* DataController.swift */; };
+		B427CC4B23162FF800B0E992 /* Notebook+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B427CC4A23162FF800B0E992 /* Notebook+Extension.swift */; };
+		B427CC4D2316302000B0E992 /* Note+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B427CC4C2316302000B0E992 /* Note+Extension.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,6 +58,8 @@
 		A76557E61F8BC1AC00EFF9B8 /* OpenSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "OpenSans-Regular.ttf"; sourceTree = "<group>"; };
 		B427CC4523160A5300B0E992 /* Notebook.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Notebook.xcdatamodel; sourceTree = "<group>"; };
 		B427CC472316150300B0E992 /* DataController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataController.swift; sourceTree = "<group>"; };
+		B427CC4A23162FF800B0E992 /* Notebook+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notebook+Extension.swift"; sourceTree = "<group>"; };
+		B427CC4C2316302000B0E992 /* Note+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Note+Extension.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -140,6 +144,7 @@
 		03B2698C1F2F831700C7433C /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				B427CC4923162FD900B0E992 /* ManagedObjectExtensions */,
 				B427CC4423160A5300B0E992 /* Mooskine.xcdatamodeld */,
 				B427CC472316150300B0E992 /* DataController.swift */,
 			);
@@ -180,6 +185,15 @@
 				03B269981F2F837C00C7433C /* Cell.swift */,
 			);
 			path = Protocols;
+			sourceTree = "<group>";
+		};
+		B427CC4923162FD900B0E992 /* ManagedObjectExtensions */ = {
+			isa = PBXGroup;
+			children = (
+				B427CC4A23162FF800B0E992 /* Notebook+Extension.swift */,
+				B427CC4C2316302000B0E992 /* Note+Extension.swift */,
+			);
+			path = ManagedObjectExtensions;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -298,6 +312,8 @@
 				03B2699C1F2F8AA100C7433C /* NoteDetailsViewController.swift in Sources */,
 				B427CC482316150300B0E992 /* DataController.swift in Sources */,
 				03B269A01F2F8AAD00C7433C /* Cell.swift in Sources */,
+				B427CC4B23162FF800B0E992 /* Notebook+Extension.swift in Sources */,
+				B427CC4D2316302000B0E992 /* Note+Extension.swift in Sources */,
 				03B2699D1F2F8AA100C7433C /* NotesListViewController.swift in Sources */,
 				B427CC4623160A5300B0E992 /* Mooskine.xcdatamodeld in Sources */,
 				03B2699F1F2F8AAA00C7433C /* NoteCell.swift in Sources */,
