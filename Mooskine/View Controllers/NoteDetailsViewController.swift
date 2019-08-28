@@ -24,6 +24,8 @@ class NoteDetailsViewController: UIViewController {
         df.dateStyle = .medium
         return df
     }()
+    
+    private var dataController = (UIApplication.shared.delegate as! AppDelegate).dataController
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -61,5 +63,7 @@ extension NoteDetailsViewController {
 extension NoteDetailsViewController: UITextViewDelegate {
     func textViewDidEndEditing(_ textView: UITextView) {
         note.text = textView.text
+        //really?
+        try? dataController.viewContext.save()
     }
 }
