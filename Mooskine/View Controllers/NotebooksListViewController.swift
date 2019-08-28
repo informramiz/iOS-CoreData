@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreData
 
 class NotebooksListViewController: UIViewController, UITableViewDataSource {
     /// A table view that displays a list of notebooks
@@ -21,6 +22,19 @@ class NotebooksListViewController: UIViewController, UITableViewDataSource {
         navigationItem.titleView = UIImageView(image: #imageLiteral(resourceName: "toolbar-cow"))
         navigationItem.rightBarButtonItem = editButtonItem
         updateEditButtonState()
+        loadData()
+    }
+    
+    private func loadData() {
+        let fetchRequest: NSFetchRequest<Notebook> = Notebook.fetchRequest()
+        let sortDescriptor = NSSortDescriptor(key: "creationDate", ascending: false)
+        fetchRequest.sortDescriptors = [sortDescriptor]
+        
+        let result = try? dataController.viewContext.fetch(fetchRequest)
+        if let result = result {
+            notebooks = result
+            tableView.reloadData()
+        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
