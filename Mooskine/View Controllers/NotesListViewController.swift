@@ -69,9 +69,14 @@ class NotesListViewController: UIViewController, UITableViewDataSource {
 
     // Adds a new `Note` to the end of the `notebook`'s `notes` array
     func addNote() {
-        //TODO:
-        //notebook.addNote()
-        tableView.insertRows(at: [IndexPath(row: numberOfNotes - 1, section: 0)], with: .fade)
+        let note = Note(context: dataController.viewContext)
+        note.text = "New Note"
+        note.creationDate = Date()
+        note.notebook = notebook
+        try? dataController.viewContext.save()
+        
+        notes.insert(note, at: 0)
+        tableView.insertRows(at: [IndexPath(row: 0, section: 0)], with: .fade)
         updateEditButtonState()
     }
 
