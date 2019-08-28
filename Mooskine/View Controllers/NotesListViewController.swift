@@ -36,7 +36,7 @@ class NotesListViewController: UIViewController, UITableViewDataSource {
     
     private func loadNotes() {
         let fetchRequest: NSFetchRequest<Note> = Note.fetchRequest()
-        let sortDescriptor = NSSortDescriptor(key: "creationDate", ascending: false)
+        let sortDescriptor = NSSortDescriptor(key: "creationDate", ascending: true)
         let predicate = NSPredicate(format: "notebook == %@", notebook)
         
         fetchRequest.sortDescriptors = [sortDescriptor]
