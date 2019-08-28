@@ -7,12 +7,14 @@
 //
 
 import UIKit
+import CoreData
 
 class NotesListViewController: UIViewController, UITableViewDataSource {
     /// A table view that displays a list of notes for a notebook
     @IBOutlet weak var tableView: UITableView!
 
     /// The notebook whose notes are being displayed
+    private var dataController = (UIApplication.shared.delegate as! AppDelegate).dataController
     var notebook: Notebook!
     var notes: [Note] = []
 
@@ -28,7 +30,22 @@ class NotesListViewController: UIViewController, UITableViewDataSource {
 
         navigationItem.title = notebook.name
         navigationItem.rightBarButtonItem = editButtonItem
+        loadNotes()
         updateEditButtonState()
+    }
+    
+    private func loadNotes() {
+        let fetchRequest: NSFetchRequest<Note> = Note.fetchRequest()
+        let sortDescriptor = NSSortDescriptor(key: "creationDate", ascending: false)
+        let predicate = NSPredicate(format: "notebook == %@", notebook)
+        
+        fetchRequest.sortDescriptors = [sortDescriptor]
+        fetchRequest.predicate = predicate
+        let results = try? dataController.viewContext.fetch(fetchRequest)
+        if let results = results {
+            notes = results
+            tableView.reloadData()
+        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
