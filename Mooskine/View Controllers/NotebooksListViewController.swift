@@ -108,10 +108,18 @@ class NotebooksListViewController: UIViewController, UITableViewDataSource {
         let notebookToDelete = fetchedResultsController.object(at: indexPath)
         dataController.viewContext.delete(notebookToDelete)
         try? dataController.viewContext.save()
+        
+        if !isEditingPossible {
+            setEditing(false, animated: true)
+        }
+    }
+    
+    var isEditingPossible: Bool {
+        return (fetchedResultsController.sections?[0].numberOfObjects ?? 0) > 0
     }
 
     func updateEditButtonState() {
-        navigationItem.rightBarButtonItem?.isEnabled = (fetchedResultsController.sections?[0].numberOfObjects ?? 0) > 0
+        navigationItem.rightBarButtonItem?.isEnabled = isEditingPossible
     }
 
     override func setEditing(_ editing: Bool, animated: Bool) {
