@@ -20,6 +20,9 @@ class ListDataSource<EntityType: NSManagedObject, CellType: UITableViewCell>: NS
     var numberOfSections: Int {
         return fetchedResultsController.sections?.count ?? 1
     }
+    var isEditingPossible: Bool {
+        return numberOfRowsIn(section: 0) > 0
+    }
     
     init(tableView: UITableView, viewContext: NSManagedObjectContext, fetchRequest: NSFetchRequest<EntityType>,
          configureCell: @escaping (CellType, EntityType) -> Void) {
@@ -40,6 +43,7 @@ class ListDataSource<EntityType: NSManagedObject, CellType: UITableViewCell>: NS
         }
     }
     
+    // MARK: - Table View Data Source
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return numberOfRowsIn(section: section)
     }
@@ -54,8 +58,27 @@ class ListDataSource<EntityType: NSManagedObject, CellType: UITableViewCell>: NS
         configureCell(cell, model)
         return cell
     }
+
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+       switch editingStyle {
+       case .delete: deleteNotebook(at: indexPath)
+       default: () // Unsupported
+       }
+   }
     
+    /// Deletes the notebook at the specified index path
+    func deleteNotebook(at indexPath: IndexPath) {
+        //delete from core data first
+        let notebookToDelete = object(at: indexPath)
+        viewContext.delete(notebookToDelete)
+        try? viewContext.save()
+        
+        if !isEditingPossible {
+            tableView.setEditing(isEditingPossible, animated: true)
+        }
+    }
     
+    // MARK: - NSFetchedResultsController delegate methods
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         tableView.beginUpdates()
     }
@@ -94,7 +117,7 @@ class ListDataSource<EntityType: NSManagedObject, CellType: UITableViewCell>: NS
         }
     }
     
-    /// Mark: Utility methods
+    // MARK: Utility methods
     func numberOfRowsIn(section: Int) -> Int {
         return fetchedResultsController.sections?[section].numberOfObjects ?? 0
     }
