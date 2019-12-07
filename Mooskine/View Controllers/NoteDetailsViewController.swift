@@ -53,7 +53,9 @@ extension NoteDetailsViewController {
     }
 
     func deleteHandler(alertAction: UIAlertAction) {
-        onDelete?()
+        dataController.viewContext.delete(note)
+        try? dataController.viewContext.save()
+        navigationController?.popViewController(animated: true)
     }
 }
 
