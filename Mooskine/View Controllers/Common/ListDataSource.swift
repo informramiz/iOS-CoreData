@@ -31,13 +31,15 @@ class ListDataSource<EntityType: NSManagedObject, CellType: UITableViewCell>: NS
         self.configureCell = configureCell
         fetchedResultsController = NSFetchedResultsController<EntityType>(fetchRequest: fetchRequest, managedObjectContext: viewContext, sectionNameKeyPath: nil, cacheName: nil)
         super.init()
-        fetchedResultsController.delegate = self
         loadData()
     }
     
     private func loadData() {
+        tableView.dataSource = self
+        fetchedResultsController.delegate = self
         do {
             try fetchedResultsController.performFetch()
+            tableView.reloadData()
         } catch  {
             print(error.localizedDescription)
         }

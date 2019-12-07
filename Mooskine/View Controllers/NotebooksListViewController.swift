@@ -49,8 +49,6 @@ class NotebooksListViewController: UIViewController {
         listDataSource.onContentUpdated = {
             self.updateEditButtonState()
         }
-        
-        tableView.dataSource = listDataSource
     }
     
     override func viewWillDisappear(_ animated: Bool) {
