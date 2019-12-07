@@ -15,6 +15,11 @@ class ListDataSource<EntityType: NSManagedObject, CellType: UITableViewCell>: NS
     private let configureCell: (CellType, EntityType) -> Void
     private let fetchedResultsController: NSFetchedResultsController<EntityType>
     private let cellIdentifier = String(describing: CellType.self)
+    var onContentUpdated: (() -> Void)? = nil
+    
+    var numberOfSections: Int {
+        return fetchedResultsController.sections?.count ?? 1
+    }
     
     init(tableView: UITableView, viewContext: NSManagedObjectContext, fetchRequest: NSFetchRequest<EntityType>,
          configureCell: @escaping (CellType, EntityType) -> Void) {
@@ -36,11 +41,11 @@ class ListDataSource<EntityType: NSManagedObject, CellType: UITableViewCell>: NS
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return fetchedResultsController.sections?[section].numberOfObjects ?? 0
+        return numberOfRowsIn(section: section)
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return fetchedResultsController.sections?.count ?? 1
+        return numberOfSections
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -57,6 +62,7 @@ class ListDataSource<EntityType: NSManagedObject, CellType: UITableViewCell>: NS
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         tableView.endUpdates()
+        onContentUpdated?()
     }
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
@@ -86,5 +92,14 @@ class ListDataSource<EntityType: NSManagedObject, CellType: UITableViewCell>: NS
         default:
             tableView.reloadData()
         }
+    }
+    
+    /// Mark: Utility methods
+    func numberOfRowsIn(section: Int) -> Int {
+        return fetchedResultsController.sections?[section].numberOfObjects ?? 0
+    }
+    
+    func object(at indexPath: IndexPath) -> EntityType {
+        return fetchedResultsController.object(at: indexPath)
     }
 }
