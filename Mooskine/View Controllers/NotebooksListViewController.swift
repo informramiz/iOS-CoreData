@@ -9,12 +9,12 @@
 import UIKit
 import CoreData
 
-class NotebooksListViewController: UIViewController, UITableViewDataSource {
+class NotebooksListViewController: UIViewController {
     /// A table view that displays a list of notebooks
     @IBOutlet weak var tableView: UITableView!
     
     var dataController: DataController!
-    private var fetchedResultsController: NSFetchedResultsController<Notebook>!
+    private var listDataSource: ListDataSource<Notebook, NotebookCell>!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,8 +25,7 @@ class NotebooksListViewController: UIViewController, UITableViewDataSource {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        setupFetchedResultsController()
-        setupFetchedResultsController()
+        setupDataSource()
 
         if let indexPath = tableView.indexPathForSelectedRow {
             tableView.deselectRow(at: indexPath, animated: false)
@@ -34,24 +33,29 @@ class NotebooksListViewController: UIViewController, UITableViewDataSource {
         }
     }
     
-    private func setupFetchedResultsController() {
+    private func setupDataSource() {
         let fetchRequest: NSFetchRequest<Notebook> = Notebook.fetchRequest()
         //for FetchedResultsController adding a sort descriptor is necessary
         let sortDescriptor = NSSortDescriptor(key: "creationDate", ascending: false)
         fetchRequest.sortDescriptors = [sortDescriptor]
+        listDataSource = ListDataSource(tableView: tableView, viewContext: dataController.viewContext, fetchRequest: fetchRequest, configureCell: { (cell, notebook) in
+            // Configure cell
+            cell.nameLabel.text = notebook.name
+            let count = notebook.notes?.count ?? 0
+            let pageString = count == 1 ? "page" : "pages"
+            cell.pageCountLabel.text = "\(count) \(pageString)"
+        })
         
-        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: "notebooks")
-        fetchedResultsController.delegate = self
-        do {
-            try fetchedResultsController.performFetch()
-        } catch {
-            fatalError("The fetch could not be performed: \(error.localizedDescription)")
+        listDataSource.onContentUpdated = {
+            self.updateEditButtonState()
         }
+        
+        tableView.dataSource = listDataSource
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        fetchedResultsController = nil
+        listDataSource = nil
     }
 
     // -------------------------------------------------------------------------
@@ -102,60 +106,13 @@ class NotebooksListViewController: UIViewController, UITableViewDataSource {
         try? dataController.viewContext.save()
     }
 
-    /// Deletes the notebook at the specified index path
-    func deleteNotebook(at indexPath: IndexPath) {
-        //delete from core data first
-        let notebookToDelete = fetchedResultsController.object(at: indexPath)
-        dataController.viewContext.delete(notebookToDelete)
-        try? dataController.viewContext.save()
-        
-        if !isEditingPossible {
-            setEditing(false, animated: true)
-        }
-    }
-    
-    var isEditingPossible: Bool {
-        return (fetchedResultsController.sections?[0].numberOfObjects ?? 0) > 0
-    }
-
     func updateEditButtonState() {
-        navigationItem.rightBarButtonItem?.isEnabled = isEditingPossible
+        navigationItem.rightBarButtonItem?.isEnabled = listDataSource.isEditingPossible
     }
 
     override func setEditing(_ editing: Bool, animated: Bool) {
         super.setEditing(editing, animated: animated)
         tableView.setEditing(editing, animated: animated)
-    }
-
-    // -------------------------------------------------------------------------
-    // MARK: - Table view data source
-
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return fetchedResultsController.sections?.count ?? 1
-    }
-
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return fetchedResultsController.sections?[section].numberOfObjects ?? 0
-    }
-
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let aNotebook = fetchedResultsController.object(at: indexPath)
-        let cell = tableView.dequeueReusableCell(withIdentifier: NotebookCell.defaultReuseIdentifier, for: indexPath) as! NotebookCell
-
-        // Configure cell
-        cell.nameLabel.text = aNotebook.name
-        let count = aNotebook.notes?.count ?? 0
-        let pageString = count == 1 ? "page" : "pages"
-        cell.pageCountLabel.text = "\(count) \(pageString)"
-
-        return cell
-    }
-
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        switch editingStyle {
-        case .delete: deleteNotebook(at: indexPath)
-        default: () // Unsupported
-        }
     }
 
     // -------------------------------------------------------------------------
@@ -165,47 +122,8 @@ class NotebooksListViewController: UIViewController, UITableViewDataSource {
         // If this is a NotesListViewController, we'll configure its `Notebook`
         if let vc = segue.destination as? NotesListViewController {
             if let indexPath = tableView.indexPathForSelectedRow {
-                vc.notebook = fetchedResultsController.object(at: indexPath)
+                vc.notebook = listDataSource.object(at: indexPath)
             }
-        }
-    }
-}
-
-extension NotebooksListViewController: NSFetchedResultsControllerDelegate {
-    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        tableView.beginUpdates()
-    }
-    
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        tableView.endUpdates()
-        updateEditButtonState()
-    }
-    
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        switch type {
-        case .insert:
-            tableView.insertRows(at: [newIndexPath!], with: .fade)
-        case .delete:
-            tableView.deleteRows(at: [indexPath!], with: .fade)
-        case .move:
-            tableView.moveRow(at: indexPath!, to: newIndexPath!)
-        case .update:
-            tableView.reloadRows(at: [indexPath!], with: .fade)
-        default:
-            tableView.reloadData()
-        }
-    }
-    
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
-        let indexSet = IndexSet(integer: sectionIndex)
-        
-        switch type {
-        case .insert:
-            tableView.insertSections(indexSet, with: .fade)
-        case .delete:
-            tableView.deleteSections(indexSet, with: .fade)
-        default:
-            fatalError("Invalid change type in controller(_:didChange:atSectionIndex:for:). Only .insert or .delete should be possible.")
         }
     }
 }
