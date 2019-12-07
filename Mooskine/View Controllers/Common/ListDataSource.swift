@@ -61,16 +61,16 @@ class ListDataSource<EntityType: NSManagedObject, CellType: UITableViewCell>: NS
 
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
        switch editingStyle {
-       case .delete: deleteNotebook(at: indexPath)
+       case .delete: deleteItem(at: indexPath)
        default: () // Unsupported
        }
    }
     
-    /// Deletes the notebook at the specified index path
-    func deleteNotebook(at indexPath: IndexPath) {
+    /// Deletes the item at the specified index path
+    func deleteItem(at indexPath: IndexPath) {
         //delete from core data first
-        let notebookToDelete = object(at: indexPath)
-        viewContext.delete(notebookToDelete)
+        let itemToDelete = object(at: indexPath)
+        viewContext.delete(itemToDelete)
         try? viewContext.save()
         
         if !isEditingPossible {
